@@ -108,8 +108,9 @@ async def help(ctx):
 
     embed.add_field(name="Command prefix", value="`./`", inline=False)
     embed.add_field(name="List of commands",
-                    value="• `ip` ~ returns the public IP of the computer hosting the server\n"
-                          "• `help` ~ returns this menu",
+                    value="• `ip` returns the public IP of the computer hosting the server\n"
+                          "• `status` returns information about the Minecraft server (i.e. latency, online players)\n"
+                          "• `help` returns this menu",
                     inline=False)
     embed.add_field(name="Github repository",
                     value="[www.github.com/anthonynikolaidis/discord-ip-bot]"
