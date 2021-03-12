@@ -15,18 +15,29 @@ Prefix: `./`
 - `help` returns a menu with all available commands and information about the bot
 
 ## How to deploy
-You need to create a file named `token.json` that contains your discord bot token.
+Firstly, you have to install the following libraries: discord.py, requests, bs4, mcstatus
+
+To install them all at once, you can use:
+```commandline
+pip install discord.py requests bs4 mcstatus
+```
+
+If you have Python 2.7 installed, you will need to use pip3 instead of pip.
+
+Next, you need to create a file named `config.json` that contains your discord bot token, preferred prefix, and server port.
 ```json
 {
-  "Token": "<your_token>"
+  "Token": "<your_token>",
+  "Prefix": "./",
+  "Port": 25565
 }
 ```
 
-To start the bot, run `bot.py`.
+Finally, to start the bot, run `bot.py`.
 
 ## Minimum requirements
 - Python version: 3.8
 
 ## APIs and libraries used
-- Get server's public IP (API): [ipify.org](https://www.ipify.org/)
-- Get Minecraft server statistics (Library): [mcstatus](https://github.com/Dinnerbone/mcstatus)
+- Server's public IP (API): [ipify.org](https://www.ipify.org/)
+- Minecraft server statistics (Library): [mcstatus](https://github.com/Dinnerbone/mcstatus)
