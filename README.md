@@ -9,7 +9,7 @@ Quix#5870
 Prefix: `./`
 
 - `ip` returns the public IP of the computer hosting the server
-  ![ip](https://i.imgur.com/u2aKzCn.png)
+  ![ip](https://i.imgur.com/gCivBTN.png)
 - `status` returns information about the Minecraft server (i.e. latency, online players)
   ![status](https://i.imgur.com/tWvXoMw.png)
 - `help` returns a menu with all available commands and information about the bot
