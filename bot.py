@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 
 import requests
+from bs4 import BeautifulSoup
 
 from mcstatus import MinecraftServer
 
@@ -12,21 +13,62 @@ from discord.utils import find
 
 logging.basicConfig(level=logging.INFO)
 
-bot = commands.Bot(command_prefix="./")
+with open('config.json') as data:
+    config = json.load(data)
+
+bot = commands.Bot(command_prefix=config["Prefix"])
 bot.remove_command("help")
 
 embed_color = discord.Color.green()
 icon_url = "https://i.imgur.com/4sg6CWv.png"
 
-local_ip = "10.0.0.169"
-server_port = 25565
 
-server = MinecraftServer(local_ip, server_port)
+def get_ip():
+    url = "https://api.ipify.org"
+    public_ip = requests.get(url).text
+
+    return public_ip
+
+
+def get_ip_info():
+    public_ip = get_ip()
+
+    what_is_my_ip_url = f"https://www.whatismyip.com/{public_ip}/?iref=home"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/89.0.4389.82 Safari/537.36 "
+    }
+
+    page = requests.get(what_is_my_ip_url, headers=headers)
+
+    soup = BeautifulSoup(page.content, "html.parser")
+
+    items = soup.find_all("li", {"class": "list-group-item"})
+
+    for i in range(0, len(items)):
+        items[i] = items[i].get_text().split(": ")[1]
+
+    ip_info = {
+        "IP": public_ip,
+        "Location": items[0] + ", " + items[2] + " (GMT " + items[4] + ")",
+        "ISP": "[" + items[6] + "](http://www." + items[7] + "/)"
+    }
+
+    global server
+    server = MinecraftServer(public_ip, server_port)
+
+    return ip_info
+
+
+initial_ip = get_ip()
+server_port = config["Port"]
+
+server = MinecraftServer(initial_ip, server_port)
 
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Game(name="Use ./ip to get started!"))
+    await bot.change_presence(activity=discord.Game(name=f"Use {config['Prefix']}ip to get started!"))
 
 
 @bot.event
@@ -44,19 +86,13 @@ async def on_guild_join(guild):
         await general.send(embed=embed)
 
 
-def get_ip():
-    url = "https://api.ipify.org"
-    public_ip = requests.get(url).text
-
-    global server
-    server = MinecraftServer(public_ip, server_port)
-
-    return public_ip
-
-
 @bot.command()
 async def ip(ctx):
-    server_ip = get_ip()
+    ip_info = get_ip_info()
+
+    server_ip = ip_info["IP"]
+    location = ip_info["Location"]
+    isp = ip_info["ISP"]
 
     embed = discord.Embed(
         timestamp=datetime.utcnow(),
@@ -66,12 +102,25 @@ async def ip(ctx):
 
     embed.add_field(name="Server IP", value=server_ip, inline=False)
 
+    embed.add_field(name="Location", value=location, inline=False)
+
+    embed.add_field(name="ISP", value=isp, inline=False)
+
     msg = await ctx.send(embed=embed)
 
 
 @bot.command()
 async def status(ctx):
-    get_ip()
+    wait_embed = discord.Embed(
+        description="Querying server... Please, wait.",
+        timestamp=datetime.utcnow(),
+        color=embed_color
+    )
+    wait_embed.set_author(name="IP-Bot | Get server status", icon_url=icon_url)
+
+    wait_msg = await ctx.send(embed=wait_embed)
+
+    get_ip_info()
 
     query = server.query()
     server_status = server.status()
@@ -89,13 +138,16 @@ async def status(ctx):
         timestamp=datetime.utcnow(),
         color=embed_color
     )
-    embed.set_author(name="IP-Bot | Get online players", icon_url=icon_url)
+    embed.set_author(name="IP-Bot | Get server status", icon_url=icon_url)
 
     embed.add_field(
         name="Online players (" + str(server_status.players.online) + "/" + str(server_status.players.max) + ")",
         value=player_string, inline=False)
 
+    # await wait_msg.edit(embed=embed)     # edits sent embed
+
     msg = await ctx.send(embed=embed)
+    await bot.http.delete_message(ctx.channel.id, wait_msg.id)   # deletes wait message
 
 
 @bot.command()
@@ -122,7 +174,4 @@ async def help(ctx):
     msg = await ctx.send(embed=embed)
 
 
-with open('token.json') as config:
-    data = json.load(config)
-
-bot.run(data["Token"])
+bot.run(config["Token"])
