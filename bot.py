@@ -45,13 +45,16 @@ def get_ip_info():
 
     items = soup.find_all("li", {"class": "list-group-item"})
 
-    for i in range(0, len(items)):
-        items[i] = items[i].get_text().split(": ")[1]
+    city = items[0].get_text().split(": ")[1]
+    country = items[2].get_text().split(": ")[1]
+    timezone = items[4].get_text().split(": ")[1]
+    isp = items[6].get_text().split(": ")[1]
+    isp_link = items[8].get_text().split(": ")[1]
 
     ip_info = {
         "IP": public_ip,
-        "Location": items[0] + ", " + items[2] + " (GMT " + items[4] + ")",
-        "ISP": "[" + items[6] + "](http://www." + items[7] + "/)"
+        "Location": city + ", " + country + " (GMT " + timezone + ")",
+        "ISP": "[" + isp + "](http://www." + isp_link + "/)"
     }
 
     global server
@@ -144,10 +147,10 @@ async def status(ctx):
         name="Online players (" + str(server_status.players.online) + "/" + str(server_status.players.max) + ")",
         value=player_string, inline=False)
 
-    # await wait_msg.edit(embed=embed)     # edits sent embed
+    # await wait_msg.edit(embed=embed)     # edit sent embed
 
     msg = await ctx.send(embed=embed)
-    await bot.http.delete_message(ctx.channel.id, wait_msg.id)   # deletes wait message
+    await bot.http.delete_message(ctx.channel.id, wait_msg.id)  # deletes wait message
 
 
 @bot.command()
