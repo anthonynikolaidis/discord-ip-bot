@@ -10,8 +10,10 @@ Prefix: `./`
 
 - `ip` returns the public IP of the computer hosting the server
   ![ip](https://i.imgur.com/8IYlZXo.png 'Click to view full resolution image')
+  
 - `status` returns information about the Minecraft server (i.e. latency, online players)
   ![status](https://i.imgur.com/tWvXoMw.png 'Click to view full resolution image')
+  
 - `help` returns a menu with all available commands and information about the bot
 
 ## How to deploy
