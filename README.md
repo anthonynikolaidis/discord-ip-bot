@@ -9,9 +9,9 @@ Quix#5870
 Prefix: `./`
 
 - `ip` returns the public IP of the computer hosting the server
-  ![ip](https://i.imgur.com/gCivBTN.png)
+  ![ip](https://i.imgur.com/8IYlZXo.png 'Click to view full resolution image')
 - `status` returns information about the Minecraft server (i.e. latency, online players)
-  ![status](https://i.imgur.com/tWvXoMw.png)
+  ![status](https://i.imgur.com/tWvXoMw.png 'Click to view full resolution image')
 - `help` returns a menu with all available commands and information about the bot
 
 ## How to deploy
@@ -19,7 +19,7 @@ Firstly, you have to install the following libraries: discord.py, requests, bs4,
 
 To install them all at once, you can use:
 ```commandline
-pip install discord.py requests bs4 mcstatus
+pip install discord.py requests mcstatus
 ```
 
 If you have Python 2.7 installed, you will need to use pip3 instead of pip.
@@ -27,7 +27,7 @@ If you have Python 2.7 installed, you will need to use pip3 instead of pip.
 Next, you need to create a file named `config.json` that contains your discord bot token, preferred prefix, and server port.
 ```json
 {
-  "Token": "<your_token>",
+  "Token": "<your_bot_token>",
   "Prefix": "./",
   "Port": 25565
 }
