@@ -2,7 +2,6 @@ import json
 from datetime import datetime
 
 import requests
-from bs4 import BeautifulSoup
 
 from mcstatus import MinecraftServer
 
@@ -33,34 +32,15 @@ def get_ip():
 def get_ip_info():
     public_ip = get_ip()
 
-    what_is_my_ip_url = f"https://www.whatismyip.com/{public_ip}/?iref=home"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
-                      "Chrome/89.0.4389.82 Safari/537.36 "
-    }
-
-    page = requests.get(what_is_my_ip_url, headers=headers)
-
-    soup = BeautifulSoup(page.content, "html.parser")
-
-    items = soup.find_all("li", {"class": "list-group-item"})
-
-    city = items[0].get_text().split(": ")[1]
-    country = items[2].get_text().split(": ")[1]
-    timezone = items[4].get_text().split(": ")[1]
-    isp = items[6].get_text().split(": ")[1]
-    isp_link = items[8].get_text().split(": ")[1]
-
-    ip_info = {
-        "IP": public_ip,
-        "Location": city + ", " + country + " (GMT " + timezone + ")",
-        "ISP": "[" + isp + "](http://www." + isp_link + "/)"
-    }
+    what_is_my_ip_url = f"https://www.whatismyip.com/{public_ip}/"
 
     global server
     server = MinecraftServer(public_ip, server_port)
 
-    return ip_info
+    return {
+        "IP": public_ip,
+        "Link": what_is_my_ip_url
+    }
 
 
 initial_ip = get_ip()
@@ -94,20 +74,15 @@ async def ip(ctx):
     ip_info = get_ip_info()
 
     server_ip = ip_info["IP"]
-    location = ip_info["Location"]
-    isp = ip_info["ISP"]
+    link = ip_info["Link"]
 
     embed = discord.Embed(
         timestamp=datetime.utcnow(),
         color=embed_color
     )
-    embed.set_author(name="IP-Bot | Get server IP", icon_url=icon_url)
+    embed.set_author(name="IP-Bot | Get server IP", url=link, icon_url=icon_url)
 
     embed.add_field(name="Server IP", value=server_ip, inline=False)
-
-    embed.add_field(name="Location", value=location, inline=False)
-
-    embed.add_field(name="ISP", value=isp, inline=False)
 
     msg = await ctx.send(embed=embed)
 
